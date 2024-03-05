@@ -1,88 +1,61 @@
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)
 
 AM_CFLAGS = \
 	$(GLOBAL_CFLAGS) \
+	$(libusbmuxd_CFLAGS) \
 	$(libgnutls_CFLAGS) \
 	$(libtasn1_CFLAGS) \
-	$(openssl_CFLAGS) \
 	$(libplist_CFLAGS) \
 	$(LFS_CFLAGS) \
+	$(openssl_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
-AM_LIBS = \
+AM_LDFLAGS = \
 	$(libgnutls_LIBS) \
 	$(libtasn1_LIBS) \
-	$(openssl_LIBS) \
 	$(libplist_LIBS) \
+	$(libusbmuxd_LIBS) \
+	$(libgcrypt_LIBS) \
+	$(openssl_LIBS) \
 	$(PTHREAD_LIBS)
 
-if HAVE_CYTHON
+lib_LTLIBRARIES = libimobiledevice-1.0.la
+libimobiledevice_1_0_la_LIBADD = $(top_builddir)/common/libinternalcommon.la
+libimobiledevice_1_0_la_LDFLAGS = $(AM_LDFLAGS) -version-info $(LIBIMOBILEDEVICE_SO_VERSION) -no-undefined
+libimobiledevice_1_0_la_SOURCES = \
+	idevice.c idevice.h \
+	service.c service.h \
+	property_list_service.c property_list_service.h \
+	device_link_service.c device_link_service.h \
+	lockdown.c lockdown.h \
+	afc.c afc.h \
+	file_relay.c file_relay.h \
+	notification_proxy.c notification_proxy.h \
+	installation_proxy.c installation_proxy.h \
+	sbservices.c sbservices.h \
+	mobile_image_mounter.c mobile_image_mounter.h \
+	screenshotr.c screenshotr.h \
+	mobilesync.c mobilesync.h \
+	mobilebackup.c mobilebackup.h \
+	house_arrest.c house_arrest.h \
+	mobilebackup2.c mobilebackup2.h \
+	misagent.c misagent.h \
+	restore.c restore.h \
+	diagnostics_relay.c diagnostics_relay.h \
+	heartbeat.c heartbeat.h \
+	debugserver.c debugserver.h \
+	webinspector.c webinspector.h \
+	mobileactivation.c mobileactivation.h \
+	preboard.c preboard.h  \
+	companion_proxy.c companion_proxy.h \
+	syslog_relay.c syslog_relay.h
 
-BUILT_SOURCES = imobiledevice.c
-PXDINCLUDES = \
-	imobiledevice.pxd \
-	$(CYTHON_PLIST_INCLUDE_DIR)/plist.pxd
-
-PXIINCLUDES = \
-	lockdown.pxi \
-	mobilesync.pxi \
-	notification_proxy.pxi \
-	sbservices.pxi \
-	mobilebackup.pxi \
-	mobilebackup2.pxi \
-	afc.pxi \
-	file_relay.pxi \
-	screenshotr.pxi \
-	installation_proxy.pxi \
-	webinspector.pxi \
-	heartbeat.pxi \
-	diagnostics_relay.pxi \
-	misagent.pxi \
-	house_arrest.pxi \
-	restore.pxi \
-	mobile_image_mounter.pxi \
-	debugserver.pxi
-
-CLEANFILES = \
-	*.pyc \
-	*.pyo \
-	imobiledevice.c
-
-EXTRA_DIST = \
-	imobiledevice.pyx \
-	imobiledevice.pxd \
-	$(PXIINCLUDES)
-
-imobiledevicedir = $(pyexecdir)
-imobiledevice_LTLIBRARIES = imobiledevice.la
-imobiledevice_la_SOURCES = imobiledevice.pyx
-imobiledevice_la_CFLAGS = \
-	-I$(top_srcdir)/include \
-	-I$(top_srcdir)/src \
-	$(PYTHON_CPPFLAGS) \
-	$(AM_CFLAGS) \
-	-Wno-shadow \
-	-Wno-redundant-decls \
-	-Wno-switch-default \
-	-Wno-strict-aliasing \
-	-Wno-implicit-function-declaration \
-	-fvisibility=default \
-	$(CYTHON_CFLAGS)
-
-imobiledevice_la_LDFLAGS = \
-	-module \
-	-avoid-version \
-	-L$(libdir) \
-	$(PYTHON_LIBS) \
-	$(AM_LIBS) \
-	-no-undefined
-
-imobiledevice_la_LIBADD = $(top_builddir)/src/libimobiledevice-1.0.la
-
-imobiledevice.c: imobiledevice.pyx $(PXDINCLUDES) $(PXIINCLUDES)
-
-.pyx.c:
-	$(CYTHON) -I$(CYTHON_PLIST_INCLUDE_DIR) -I$(top_srcdir)/src -o $@ $<
-
+if WIN32
+libimobiledevice_1_0_la_LDFLAGS += -avoid-version -static-libgcc
+libimobiledevice_1_0_la_LIBADD += -lole32 -lws2_32 -lgdi32
 endif
+
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libimobiledevice-1.0.pc

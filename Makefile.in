@@ -14,6 +14,7 @@
 
 @SET_MAKE@
 
+
 VPATH = @srcdir@
 am__is_gnu_make = { \
   if test -z '$(MAKELEVEL)'; then \
@@ -88,7 +89,9 @@ PRE_UNINSTALL = :
 POST_UNINSTALL = :
 build_triplet = @build@
 host_triplet = @host@
-subdir = cython
+@WIN32_TRUE@am__append_1 = -avoid-version -static-libgcc
+@WIN32_TRUE@am__append_2 = -lole32 -lws2_32 -lgdi32
+subdir = src
 ACLOCAL_M4 = $(top_srcdir)/aclocal.m4
 am__aclocal_m4_deps = $(top_srcdir)/m4/ac_pkg_cython.m4 \
 	$(top_srcdir)/m4/as-compiler-flag.m4 \
@@ -103,7 +106,7 @@ am__configure_deps = $(am__aclocal_m4_deps) $(CONFIGURE_DEPENDENCIES) \
 DIST_COMMON = $(srcdir)/Makefile.am $(am__DIST_COMMON)
 mkinstalldirs = $(install_sh) -d
 CONFIG_HEADER = $(top_builddir)/config.h
-CONFIG_CLEAN_FILES =
+CONFIG_CLEAN_FILES = libimobiledevice-1.0.pc
 CONFIG_CLEAN_VPATH_FILES =
 am__vpath_adj_setup = srcdirstrip=`echo "$(srcdir)" | sed 's|.|.|g'`;
 am__vpath_adj = case $$p in \
@@ -132,24 +135,31 @@ am__uninstall_files_from_dir = { \
     || { echo " ( cd '$$dir' && rm -f" $$files ")"; \
          $(am__cd) "$$dir" && rm -f $$files; }; \
   }
-am__installdirs = "$(DESTDIR)$(imobiledevicedir)"
-LTLIBRARIES = $(imobiledevice_LTLIBRARIES)
-@HAVE_CYTHON_TRUE@imobiledevice_la_DEPENDENCIES =  \
-@HAVE_CYTHON_TRUE@	$(top_builddir)/src/libimobiledevice-1.0.la
-am__imobiledevice_la_SOURCES_DIST = imobiledevice.pyx
-@HAVE_CYTHON_TRUE@am_imobiledevice_la_OBJECTS =  \
-@HAVE_CYTHON_TRUE@	imobiledevice_la-imobiledevice.lo
-imobiledevice_la_OBJECTS = $(am_imobiledevice_la_OBJECTS)
+am__installdirs = "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)"
+LTLIBRARIES = $(lib_LTLIBRARIES)
+am__DEPENDENCIES_1 =
+libimobiledevice_1_0_la_DEPENDENCIES =  \
+	$(top_builddir)/common/libinternalcommon.la \
+	$(am__DEPENDENCIES_1)
+am_libimobiledevice_1_0_la_OBJECTS = idevice.lo service.lo \
+	property_list_service.lo device_link_service.lo lockdown.lo \
+	afc.lo file_relay.lo notification_proxy.lo \
+	installation_proxy.lo sbservices.lo mobile_image_mounter.lo \
+	screenshotr.lo mobilesync.lo mobilebackup.lo house_arrest.lo \
+	mobilebackup2.lo misagent.lo restore.lo diagnostics_relay.lo \
+	heartbeat.lo debugserver.lo webinspector.lo \
+	mobileactivation.lo preboard.lo companion_proxy.lo \
+	syslog_relay.lo
+libimobiledevice_1_0_la_OBJECTS =  \
+	$(am_libimobiledevice_1_0_la_OBJECTS)
 AM_V_lt = $(am__v_lt_@AM_V@)
 am__v_lt_ = $(am__v_lt_@AM_DEFAULT_V@)
 am__v_lt_0 = --silent
 am__v_lt_1 = 
-imobiledevice_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
+libimobiledevice_1_0_la_LINK = $(LIBTOOL) $(AM_V_lt) --tag=CC \
 	$(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=link $(CCLD) \
-	$(imobiledevice_la_CFLAGS) $(CFLAGS) \
-	$(imobiledevice_la_LDFLAGS) $(LDFLAGS) -o $@
-@HAVE_CYTHON_TRUE@am_imobiledevice_la_rpath = -rpath \
-@HAVE_CYTHON_TRUE@	$(imobiledevicedir)
+	$(AM_CFLAGS) $(CFLAGS) $(libimobiledevice_1_0_la_LDFLAGS) \
+	$(LDFLAGS) -o $@
 AM_V_P = $(am__v_P_@AM_V@)
 am__v_P_ = $(am__v_P_@AM_DEFAULT_V@)
 am__v_P_0 = false
@@ -165,7 +175,21 @@ am__v_at_1 =
 DEFAULT_INCLUDES = -I.@am__isrc@ -I$(top_builddir)
 depcomp = $(SHELL) $(top_srcdir)/depcomp
 am__maybe_remake_depfiles = depfiles
-am__depfiles_remade = ./$(DEPDIR)/imobiledevice_la-imobiledevice.Plo
+am__depfiles_remade = ./$(DEPDIR)/afc.Plo \
+	./$(DEPDIR)/companion_proxy.Plo ./$(DEPDIR)/debugserver.Plo \
+	./$(DEPDIR)/device_link_service.Plo \
+	./$(DEPDIR)/diagnostics_relay.Plo ./$(DEPDIR)/file_relay.Plo \
+	./$(DEPDIR)/heartbeat.Plo ./$(DEPDIR)/house_arrest.Plo \
+	./$(DEPDIR)/idevice.Plo ./$(DEPDIR)/installation_proxy.Plo \
+	./$(DEPDIR)/lockdown.Plo ./$(DEPDIR)/misagent.Plo \
+	./$(DEPDIR)/mobile_image_mounter.Plo \
+	./$(DEPDIR)/mobileactivation.Plo ./$(DEPDIR)/mobilebackup.Plo \
+	./$(DEPDIR)/mobilebackup2.Plo ./$(DEPDIR)/mobilesync.Plo \
+	./$(DEPDIR)/notification_proxy.Plo ./$(DEPDIR)/preboard.Plo \
+	./$(DEPDIR)/property_list_service.Plo ./$(DEPDIR)/restore.Plo \
+	./$(DEPDIR)/sbservices.Plo ./$(DEPDIR)/screenshotr.Plo \
+	./$(DEPDIR)/service.Plo ./$(DEPDIR)/syslog_relay.Plo \
+	./$(DEPDIR)/webinspector.Plo
 am__mv = mv -f
 COMPILE = $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) \
 	$(CPPFLAGS) $(AM_CFLAGS) $(CFLAGS)
@@ -185,13 +209,14 @@ AM_V_CCLD = $(am__v_CCLD_@AM_V@)
 am__v_CCLD_ = $(am__v_CCLD_@AM_DEFAULT_V@)
 am__v_CCLD_0 = @echo "  CCLD    " $@;
 am__v_CCLD_1 = 
-SOURCES = $(imobiledevice_la_SOURCES)
-DIST_SOURCES = $(am__imobiledevice_la_SOURCES_DIST)
+SOURCES = $(libimobiledevice_1_0_la_SOURCES)
+DIST_SOURCES = $(libimobiledevice_1_0_la_SOURCES)
 am__can_run_installinfo = \
   case $$AM_UPDATE_INFO_DIR in \
     n|no|NO) false;; \
     *) (install-info --version) >/dev/null 2>&1;; \
   esac
+DATA = $(pkgconfig_DATA)
 am__tagged_files = $(HEADERS) $(SOURCES) $(TAGS_FILES) $(LISP)
 # Read a list of newline-separated strings from the standard input,
 # and print each of them once, without duplicates.  Input order is
@@ -211,7 +236,8 @@ am__define_uniq_tagged_files = \
   done | $(am__uniquify_input)`
 ETAGS = etags
 CTAGS = ctags
-am__DIST_COMMON = $(srcdir)/Makefile.in $(top_srcdir)/depcomp
+am__DIST_COMMON = $(srcdir)/Makefile.in \
+	$(srcdir)/libimobiledevice-1.0.pc.in $(top_srcdir)/depcomp
 DISTFILES = $(DIST_COMMON) $(DIST_SOURCES) $(TEXINFOS) $(EXTRA_DIST)
 ACLOCAL = @ACLOCAL@
 AMTAR = @AMTAR@
@@ -378,89 +404,67 @@ top_build_prefix = @top_build_prefix@
 top_builddir = @top_builddir@
 top_srcdir = @top_srcdir@
 AM_CPPFLAGS = \
-	-I$(top_srcdir)/include
+	-I$(top_srcdir)/include \
+	-I$(top_srcdir)
 
 AM_CFLAGS = \
 	$(GLOBAL_CFLAGS) \
+	$(libusbmuxd_CFLAGS) \
 	$(libgnutls_CFLAGS) \
 	$(libtasn1_CFLAGS) \
-	$(openssl_CFLAGS) \
 	$(libplist_CFLAGS) \
 	$(LFS_CFLAGS) \
+	$(openssl_CFLAGS) \
 	$(PTHREAD_CFLAGS)
 
-AM_LIBS = \
+AM_LDFLAGS = \
 	$(libgnutls_LIBS) \
 	$(libtasn1_LIBS) \
-	$(openssl_LIBS) \
 	$(libplist_LIBS) \
+	$(libusbmuxd_LIBS) \
+	$(libgcrypt_LIBS) \
+	$(openssl_LIBS) \
 	$(PTHREAD_LIBS)
 
-@HAVE_CYTHON_TRUE@BUILT_SOURCES = imobiledevice.c
-@HAVE_CYTHON_TRUE@PXDINCLUDES = \
-@HAVE_CYTHON_TRUE@	imobiledevice.pxd \
-@HAVE_CYTHON_TRUE@	$(CYTHON_PLIST_INCLUDE_DIR)/plist.pxd
+lib_LTLIBRARIES = libimobiledevice-1.0.la
+libimobiledevice_1_0_la_LIBADD =  \
+	$(top_builddir)/common/libinternalcommon.la $(am__append_2)
+libimobiledevice_1_0_la_LDFLAGS = $(AM_LDFLAGS) -version-info \
+	$(LIBIMOBILEDEVICE_SO_VERSION) -no-undefined $(am__append_1)
+libimobiledevice_1_0_la_SOURCES = \
+	idevice.c idevice.h \
+	service.c service.h \
+	property_list_service.c property_list_service.h \
+	device_link_service.c device_link_service.h \
+	lockdown.c lockdown.h \
+	afc.c afc.h \
+	file_relay.c file_relay.h \
+	notification_proxy.c notification_proxy.h \
+	installation_proxy.c installation_proxy.h \
+	sbservices.c sbservices.h \
+	mobile_image_mounter.c mobile_image_mounter.h \
+	screenshotr.c screenshotr.h \
+	mobilesync.c mobilesync.h \
+	mobilebackup.c mobilebackup.h \
+	house_arrest.c house_arrest.h \
+	mobilebackup2.c mobilebackup2.h \
+	misagent.c misagent.h \
+	restore.c restore.h \
+	diagnostics_relay.c diagnostics_relay.h \
+	heartbeat.c heartbeat.h \
+	debugserver.c debugserver.h \
+	webinspector.c webinspector.h \
+	mobileactivation.c mobileactivation.h \
+	preboard.c preboard.h  \
+	companion_proxy.c companion_proxy.h \
+	syslog_relay.c syslog_relay.h
 
-@HAVE_CYTHON_TRUE@PXIINCLUDES = \
-@HAVE_CYTHON_TRUE@	lockdown.pxi \
-@HAVE_CYTHON_TRUE@	mobilesync.pxi \
-@HAVE_CYTHON_TRUE@	notification_proxy.pxi \
-@HAVE_CYTHON_TRUE@	sbservices.pxi \
-@HAVE_CYTHON_TRUE@	mobilebackup.pxi \
-@HAVE_CYTHON_TRUE@	mobilebackup2.pxi \
-@HAVE_CYTHON_TRUE@	afc.pxi \
-@HAVE_CYTHON_TRUE@	file_relay.pxi \
-@HAVE_CYTHON_TRUE@	screenshotr.pxi \
-@HAVE_CYTHON_TRUE@	installation_proxy.pxi \
-@HAVE_CYTHON_TRUE@	webinspector.pxi \
-@HAVE_CYTHON_TRUE@	heartbeat.pxi \
-@HAVE_CYTHON_TRUE@	diagnostics_relay.pxi \
-@HAVE_CYTHON_TRUE@	misagent.pxi \
-@HAVE_CYTHON_TRUE@	house_arrest.pxi \
-@HAVE_CYTHON_TRUE@	restore.pxi \
-@HAVE_CYTHON_TRUE@	mobile_image_mounter.pxi \
-@HAVE_CYTHON_TRUE@	debugserver.pxi
-
-@HAVE_CYTHON_TRUE@CLEANFILES = \
-@HAVE_CYTHON_TRUE@	*.pyc \
-@HAVE_CYTHON_TRUE@	*.pyo \
-@HAVE_CYTHON_TRUE@	imobiledevice.c
-
-@HAVE_CYTHON_TRUE@EXTRA_DIST = \
-@HAVE_CYTHON_TRUE@	imobiledevice.pyx \
-@HAVE_CYTHON_TRUE@	imobiledevice.pxd \
-@HAVE_CYTHON_TRUE@	$(PXIINCLUDES)
-
-@HAVE_CYTHON_TRUE@imobiledevicedir = $(pyexecdir)
-@HAVE_CYTHON_TRUE@imobiledevice_LTLIBRARIES = imobiledevice.la
-@HAVE_CYTHON_TRUE@imobiledevice_la_SOURCES = imobiledevice.pyx
-@HAVE_CYTHON_TRUE@imobiledevice_la_CFLAGS = \
-@HAVE_CYTHON_TRUE@	-I$(top_srcdir)/include \
-@HAVE_CYTHON_TRUE@	-I$(top_srcdir)/src \
-@HAVE_CYTHON_TRUE@	$(PYTHON_CPPFLAGS) \
-@HAVE_CYTHON_TRUE@	$(AM_CFLAGS) \
-@HAVE_CYTHON_TRUE@	-Wno-shadow \
-@HAVE_CYTHON_TRUE@	-Wno-redundant-decls \
-@HAVE_CYTHON_TRUE@	-Wno-switch-default \
-@HAVE_CYTHON_TRUE@	-Wno-strict-aliasing \
-@HAVE_CYTHON_TRUE@	-Wno-implicit-function-declaration \
-@HAVE_CYTHON_TRUE@	-fvisibility=default \
-@HAVE_CYTHON_TRUE@	$(CYTHON_CFLAGS)
-
-@HAVE_CYTHON_TRUE@imobiledevice_la_LDFLAGS = \
-@HAVE_CYTHON_TRUE@	-module \
-@HAVE_CYTHON_TRUE@	-avoid-version \
-@HAVE_CYTHON_TRUE@	-L$(libdir) \
-@HAVE_CYTHON_TRUE@	$(PYTHON_LIBS) \
-@HAVE_CYTHON_TRUE@	$(AM_LIBS) \
-@HAVE_CYTHON_TRUE@	-no-undefined
-
-@HAVE_CYTHON_TRUE@imobiledevice_la_LIBADD = $(top_builddir)/src/libimobiledevice-1.0.la
-all: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) all-am
+pkgconfigdir = $(libdir)/pkgconfig
+pkgconfig_DATA = libimobiledevice-1.0.pc
+all: all-am
 
 .SUFFIXES:
-.SUFFIXES: .c .lo .o .obj .pyx
+.SUFFIXES: .c .lo .o .obj
 $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	@for dep in $?; do \
 	  case '$(am__configure_deps)' in \
@@ -470,9 +474,9 @@ $(srcdir)/Makefile.in:  $(srcdir)/Makefile.am  $(am__configure_deps)
 	      exit 1;; \
 	  esac; \
 	done; \
-	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu cython/Makefile'; \
+	echo ' cd $(top_srcdir) && $(AUTOMAKE) --gnu src/Makefile'; \
 	$(am__cd) $(top_srcdir) && \
-	  $(AUTOMAKE) --gnu cython/Makefile
+	  $(AUTOMAKE) --gnu src/Makefile
 Makefile: $(srcdir)/Makefile.in $(top_builddir)/config.status
 	@case '$?' in \
 	  *config.status*) \
@@ -490,34 +494,36 @@ $(top_srcdir)/configure:  $(am__configure_deps)
 $(ACLOCAL_M4):  $(am__aclocal_m4_deps)
 	cd $(top_builddir) && $(MAKE) $(AM_MAKEFLAGS) am--refresh
 $(am__aclocal_m4_deps):
+libimobiledevice-1.0.pc: $(top_builddir)/config.status $(srcdir)/libimobiledevice-1.0.pc.in
+	cd $(top_builddir) && $(SHELL) ./config.status $(subdir)/$@
 
-install-imobiledeviceLTLIBRARIES: $(imobiledevice_LTLIBRARIES)
+install-libLTLIBRARIES: $(lib_LTLIBRARIES)
 	@$(NORMAL_INSTALL)
-	@list='$(imobiledevice_LTLIBRARIES)'; test -n "$(imobiledevicedir)" || list=; \
+	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
 	list2=; for p in $$list; do \
 	  if test -f $$p; then \
 	    list2="$$list2 $$p"; \
 	  else :; fi; \
 	done; \
 	test -z "$$list2" || { \
-	  echo " $(MKDIR_P) '$(DESTDIR)$(imobiledevicedir)'"; \
-	  $(MKDIR_P) "$(DESTDIR)$(imobiledevicedir)" || exit 1; \
-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(imobiledevicedir)'"; \
-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(imobiledevicedir)"; \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(libdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(libdir)" || exit 1; \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 '$(DESTDIR)$(libdir)'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=install $(INSTALL) $(INSTALL_STRIP_FLAG) $$list2 "$(DESTDIR)$(libdir)"; \
 	}
 
-uninstall-imobiledeviceLTLIBRARIES:
+uninstall-libLTLIBRARIES:
 	@$(NORMAL_UNINSTALL)
-	@list='$(imobiledevice_LTLIBRARIES)'; test -n "$(imobiledevicedir)" || list=; \
+	@list='$(lib_LTLIBRARIES)'; test -n "$(libdir)" || list=; \
 	for p in $$list; do \
 	  $(am__strip_dir) \
-	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(imobiledevicedir)/$$f'"; \
-	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(imobiledevicedir)/$$f"; \
+	  echo " $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f '$(DESTDIR)$(libdir)/$$f'"; \
+	  $(LIBTOOL) $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=uninstall rm -f "$(DESTDIR)$(libdir)/$$f"; \
 	done
 
-clean-imobiledeviceLTLIBRARIES:
-	-test -z "$(imobiledevice_LTLIBRARIES)" || rm -f $(imobiledevice_LTLIBRARIES)
-	@list='$(imobiledevice_LTLIBRARIES)'; \
+clean-libLTLIBRARIES:
+	-test -z "$(lib_LTLIBRARIES)" || rm -f $(lib_LTLIBRARIES)
+	@list='$(lib_LTLIBRARIES)'; \
 	locs=`for p in $$list; do echo $$p; done | \
 	      sed 's|^[^/]*$$|.|; s|/[^/]*$$||; s|$$|/so_locations|' | \
 	      sort -u`; \
@@ -526,8 +532,8 @@ clean-imobiledeviceLTLIBRARIES:
 	  rm -f $${locs}; \
 	}
 
-imobiledevice.la: $(imobiledevice_la_OBJECTS) $(imobiledevice_la_DEPENDENCIES) $(EXTRA_imobiledevice_la_DEPENDENCIES) 
-	$(AM_V_CCLD)$(imobiledevice_la_LINK) $(am_imobiledevice_la_rpath) $(imobiledevice_la_OBJECTS) $(imobiledevice_la_LIBADD) $(LIBS)
+libimobiledevice-1.0.la: $(libimobiledevice_1_0_la_OBJECTS) $(libimobiledevice_1_0_la_DEPENDENCIES) $(EXTRA_libimobiledevice_1_0_la_DEPENDENCIES) 
+	$(AM_V_CCLD)$(libimobiledevice_1_0_la_LINK) -rpath $(libdir) $(libimobiledevice_1_0_la_OBJECTS) $(libimobiledevice_1_0_la_LIBADD) $(LIBS)
 
 mostlyclean-compile:
 	-rm -f *.$(OBJEXT)
@@ -535,7 +541,32 @@ mostlyclean-compile:
 distclean-compile:
 	-rm -f *.tab.c
 
-@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/imobiledevice_la-imobiledevice.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/afc.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/companion_proxy.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/debugserver.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/device_link_service.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/diagnostics_relay.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/file_relay.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/heartbeat.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/house_arrest.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/idevice.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/installation_proxy.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/lockdown.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/misagent.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mobile_image_mounter.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mobileactivation.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mobilebackup.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mobilebackup2.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/mobilesync.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/notification_proxy.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/preboard.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/property_list_service.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/restore.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/sbservices.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/screenshotr.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/service.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/syslog_relay.Plo@am__quote@ # am--include-marker
+@AMDEP_TRUE@@am__include@ @am__quote@./$(DEPDIR)/webinspector.Plo@am__quote@ # am--include-marker
 
 $(am__depfiles_remade):
 	@$(MKDIR_P) $(@D)
@@ -564,18 +595,32 @@ am--depfiles: $(am__depfiles_remade)
 @AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
 @am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LTCOMPILE) -c -o $@ $<
 
-imobiledevice_la-imobiledevice.lo: imobiledevice.c
-@am__fastdepCC_TRUE@	$(AM_V_CC)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(imobiledevice_la_CFLAGS) $(CFLAGS) -MT imobiledevice_la-imobiledevice.lo -MD -MP -MF $(DEPDIR)/imobiledevice_la-imobiledevice.Tpo -c -o imobiledevice_la-imobiledevice.lo `test -f 'imobiledevice.c' || echo '$(srcdir)/'`imobiledevice.c
-@am__fastdepCC_TRUE@	$(AM_V_at)$(am__mv) $(DEPDIR)/imobiledevice_la-imobiledevice.Tpo $(DEPDIR)/imobiledevice_la-imobiledevice.Plo
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	$(AM_V_CC)source='imobiledevice.c' object='imobiledevice_la-imobiledevice.lo' libtool=yes @AMDEPBACKSLASH@
-@AMDEP_TRUE@@am__fastdepCC_FALSE@	DEPDIR=$(DEPDIR) $(CCDEPMODE) $(depcomp) @AMDEPBACKSLASH@
-@am__fastdepCC_FALSE@	$(AM_V_CC@am__nodep@)$(LIBTOOL) $(AM_V_lt) --tag=CC $(AM_LIBTOOLFLAGS) $(LIBTOOLFLAGS) --mode=compile $(CC) $(DEFS) $(DEFAULT_INCLUDES) $(INCLUDES) $(AM_CPPFLAGS) $(CPPFLAGS) $(imobiledevice_la_CFLAGS) $(CFLAGS) -c -o imobiledevice_la-imobiledevice.lo `test -f 'imobiledevice.c' || echo '$(srcdir)/'`imobiledevice.c
-
 mostlyclean-libtool:
 	-rm -f *.lo
 
 clean-libtool:
 	-rm -rf .libs _libs
+install-pkgconfigDATA: $(pkgconfig_DATA)
+	@$(NORMAL_INSTALL)
+	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
+	if test -n "$$list"; then \
+	  echo " $(MKDIR_P) '$(DESTDIR)$(pkgconfigdir)'"; \
+	  $(MKDIR_P) "$(DESTDIR)$(pkgconfigdir)" || exit 1; \
+	fi; \
+	for p in $$list; do \
+	  if test -f "$$p"; then d=; else d="$(srcdir)/"; fi; \
+	  echo "$$d$$p"; \
+	done | $(am__base_list) | \
+	while read files; do \
+	  echo " $(INSTALL_DATA) $$files '$(DESTDIR)$(pkgconfigdir)'"; \
+	  $(INSTALL_DATA) $$files "$(DESTDIR)$(pkgconfigdir)" || exit $$?; \
+	done
+
+uninstall-pkgconfigDATA:
+	@$(NORMAL_UNINSTALL)
+	@list='$(pkgconfig_DATA)'; test -n "$(pkgconfigdir)" || list=; \
+	files=`for p in $$list; do echo $$p; done | sed -e 's|^.*/||'`; \
+	dir='$(DESTDIR)$(pkgconfigdir)'; $(am__uninstall_files_from_dir)
 
 ID: $(am__tagged_files)
 	$(am__define_uniq_tagged_files); mkid -fID $$unique
@@ -663,15 +708,13 @@ distdir-am: $(DISTFILES)
 	  fi; \
 	done
 check-am: all-am
-check: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) check-am
-all-am: Makefile $(LTLIBRARIES)
+check: check-am
+all-am: Makefile $(LTLIBRARIES) $(DATA)
 installdirs:
-	for dir in "$(DESTDIR)$(imobiledevicedir)"; do \
+	for dir in "$(DESTDIR)$(libdir)" "$(DESTDIR)$(pkgconfigdir)"; do \
 	  test -z "$$dir" || $(MKDIR_P) "$$dir"; \
 	done
-install: $(BUILT_SOURCES)
-	$(MAKE) $(AM_MAKEFLAGS) install-am
+install: install-am
 install-exec: install-exec-am
 install-data: install-data-am
 uninstall: uninstall-am
@@ -693,7 +736,6 @@ install-strip:
 mostlyclean-generic:
 
 clean-generic:
-	-test -z "$(CLEANFILES)" || rm -f $(CLEANFILES)
 
 distclean-generic:
 	-test -z "$(CONFIG_CLEAN_FILES)" || rm -f $(CONFIG_CLEAN_FILES)
@@ -702,14 +744,38 @@ distclean-generic:
 maintainer-clean-generic:
 	@echo "This command is intended for maintainers to use"
 	@echo "it deletes files that may require special tools to rebuild."
-	-test -z "$(BUILT_SOURCES)" || rm -f $(BUILT_SOURCES)
 clean: clean-am
 
-clean-am: clean-generic clean-imobiledeviceLTLIBRARIES clean-libtool \
+clean-am: clean-generic clean-libLTLIBRARIES clean-libtool \
 	mostlyclean-am
 
 distclean: distclean-am
-		-rm -f ./$(DEPDIR)/imobiledevice_la-imobiledevice.Plo
+		-rm -f ./$(DEPDIR)/afc.Plo
+	-rm -f ./$(DEPDIR)/companion_proxy.Plo
+	-rm -f ./$(DEPDIR)/debugserver.Plo
+	-rm -f ./$(DEPDIR)/device_link_service.Plo
+	-rm -f ./$(DEPDIR)/diagnostics_relay.Plo
+	-rm -f ./$(DEPDIR)/file_relay.Plo
+	-rm -f ./$(DEPDIR)/heartbeat.Plo
+	-rm -f ./$(DEPDIR)/house_arrest.Plo
+	-rm -f ./$(DEPDIR)/idevice.Plo
+	-rm -f ./$(DEPDIR)/installation_proxy.Plo
+	-rm -f ./$(DEPDIR)/lockdown.Plo
+	-rm -f ./$(DEPDIR)/misagent.Plo
+	-rm -f ./$(DEPDIR)/mobile_image_mounter.Plo
+	-rm -f ./$(DEPDIR)/mobileactivation.Plo
+	-rm -f ./$(DEPDIR)/mobilebackup.Plo
+	-rm -f ./$(DEPDIR)/mobilebackup2.Plo
+	-rm -f ./$(DEPDIR)/mobilesync.Plo
+	-rm -f ./$(DEPDIR)/notification_proxy.Plo
+	-rm -f ./$(DEPDIR)/preboard.Plo
+	-rm -f ./$(DEPDIR)/property_list_service.Plo
+	-rm -f ./$(DEPDIR)/restore.Plo
+	-rm -f ./$(DEPDIR)/sbservices.Plo
+	-rm -f ./$(DEPDIR)/screenshotr.Plo
+	-rm -f ./$(DEPDIR)/service.Plo
+	-rm -f ./$(DEPDIR)/syslog_relay.Plo
+	-rm -f ./$(DEPDIR)/webinspector.Plo
 	-rm -f Makefile
 distclean-am: clean-am distclean-compile distclean-generic \
 	distclean-tags
@@ -726,13 +792,13 @@ info: info-am
 
 info-am:
 
-install-data-am: install-imobiledeviceLTLIBRARIES
+install-data-am: install-pkgconfigDATA
 
 install-dvi: install-dvi-am
 
 install-dvi-am:
 
-install-exec-am:
+install-exec-am: install-libLTLIBRARIES
 
 install-html: install-html-am
 
@@ -755,7 +821,32 @@ install-ps-am:
 installcheck-am:
 
 maintainer-clean: maintainer-clean-am
-		-rm -f ./$(DEPDIR)/imobiledevice_la-imobiledevice.Plo
+		-rm -f ./$(DEPDIR)/afc.Plo
+	-rm -f ./$(DEPDIR)/companion_proxy.Plo
+	-rm -f ./$(DEPDIR)/debugserver.Plo
+	-rm -f ./$(DEPDIR)/device_link_service.Plo
+	-rm -f ./$(DEPDIR)/diagnostics_relay.Plo
+	-rm -f ./$(DEPDIR)/file_relay.Plo
+	-rm -f ./$(DEPDIR)/heartbeat.Plo
+	-rm -f ./$(DEPDIR)/house_arrest.Plo
+	-rm -f ./$(DEPDIR)/idevice.Plo
+	-rm -f ./$(DEPDIR)/installation_proxy.Plo
+	-rm -f ./$(DEPDIR)/lockdown.Plo
+	-rm -f ./$(DEPDIR)/misagent.Plo
+	-rm -f ./$(DEPDIR)/mobile_image_mounter.Plo
+	-rm -f ./$(DEPDIR)/mobileactivation.Plo
+	-rm -f ./$(DEPDIR)/mobilebackup.Plo
+	-rm -f ./$(DEPDIR)/mobilebackup2.Plo
+	-rm -f ./$(DEPDIR)/mobilesync.Plo
+	-rm -f ./$(DEPDIR)/notification_proxy.Plo
+	-rm -f ./$(DEPDIR)/preboard.Plo
+	-rm -f ./$(DEPDIR)/property_list_service.Plo
+	-rm -f ./$(DEPDIR)/restore.Plo
+	-rm -f ./$(DEPDIR)/sbservices.Plo
+	-rm -f ./$(DEPDIR)/screenshotr.Plo
+	-rm -f ./$(DEPDIR)/service.Plo
+	-rm -f ./$(DEPDIR)/syslog_relay.Plo
+	-rm -f ./$(DEPDIR)/webinspector.Plo
 	-rm -f Makefile
 maintainer-clean-am: distclean-am maintainer-clean-generic
 
@@ -772,32 +863,27 @@ ps: ps-am
 
 ps-am:
 
-uninstall-am: uninstall-imobiledeviceLTLIBRARIES
+uninstall-am: uninstall-libLTLIBRARIES uninstall-pkgconfigDATA
 
-.MAKE: all check install install-am install-strip
+.MAKE: install-am install-strip
 
 .PHONY: CTAGS GTAGS TAGS all all-am am--depfiles check check-am clean \
-	clean-generic clean-imobiledeviceLTLIBRARIES clean-libtool \
-	cscopelist-am ctags ctags-am distclean distclean-compile \
-	distclean-generic distclean-libtool distclean-tags distdir dvi \
-	dvi-am html html-am info info-am install install-am \
-	install-data install-data-am install-dvi install-dvi-am \
-	install-exec install-exec-am install-html install-html-am \
-	install-imobiledeviceLTLIBRARIES install-info install-info-am \
-	install-man install-pdf install-pdf-am install-ps \
-	install-ps-am install-strip installcheck installcheck-am \
-	installdirs maintainer-clean maintainer-clean-generic \
-	mostlyclean mostlyclean-compile mostlyclean-generic \
-	mostlyclean-libtool pdf pdf-am ps ps-am tags tags-am uninstall \
-	uninstall-am uninstall-imobiledeviceLTLIBRARIES
+	clean-generic clean-libLTLIBRARIES clean-libtool cscopelist-am \
+	ctags ctags-am distclean distclean-compile distclean-generic \
+	distclean-libtool distclean-tags distdir dvi dvi-am html \
+	html-am info info-am install install-am install-data \
+	install-data-am install-dvi install-dvi-am install-exec \
+	install-exec-am install-html install-html-am install-info \
+	install-info-am install-libLTLIBRARIES install-man install-pdf \
+	install-pdf-am install-pkgconfigDATA install-ps install-ps-am \
+	install-strip installcheck installcheck-am installdirs \
+	maintainer-clean maintainer-clean-generic mostlyclean \
+	mostlyclean-compile mostlyclean-generic mostlyclean-libtool \
+	pdf pdf-am ps ps-am tags tags-am uninstall uninstall-am \
+	uninstall-libLTLIBRARIES uninstall-pkgconfigDATA
 
 .PRECIOUS: Makefile
 
-
-@HAVE_CYTHON_TRUE@imobiledevice.c: imobiledevice.pyx $(PXDINCLUDES) $(PXIINCLUDES)
-
-@HAVE_CYTHON_TRUE@.pyx.c:
-@HAVE_CYTHON_TRUE@	$(CYTHON) -I$(CYTHON_PLIST_INCLUDE_DIR) -I$(top_srcdir)/src -o $@ $<
 
 # Tell versions [3.59,3.63) of GNU make to not export all variables.
 # Otherwise a system limit (for SysV at least) may be exceeded.
